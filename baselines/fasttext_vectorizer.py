@@ -1,14 +1,20 @@
 from collections import defaultdict
+import sys
+import os
+import json
 
 import numpy as np
-from gensim.models.fasttext import load_facebook_model
+# from gensim.models.fasttext import load_facebook_model
+import fasttext
 from string import punctuation
 from ruwordnet.ruwordnet_reader import RuWordnet
 
 
 class FasttextVectorizer:
     def __init__(self, model_path):
-        self.model = load_facebook_model(model_path)
+        # self.model = load_facebook_model(model_path)
+        self.model = fasttext.load_model(model_path)
+        self.vector_size = self.model.get_dimension()
         print('Model loaded')
 
     # -------------------------------------------------------------
@@ -21,14 +27,17 @@ class FasttextVectorizer:
 
     def __get_ruwordnet_vectors(self, synsets):
         ids = []
-        vectors = np.zeros((len(synsets), self.model.vector_size))
+        vectors = np.zeros((len(synsets), self.vector_size))
         for i, (_id, texts) in enumerate(synsets.items()):
             ids.append(_id)
-            vectors[i, :] = self.__get_avg_vector(texts)
+            # vectors[i, :] = self.__get_avg_vector(texts)
+            vectors[i, :] = self.model.get_sentence_vector((" ".join(texts)).lower())
+            if i in range(2):
+                print("number",i, (" ".join(texts)).lower(), vectors[i, :])
         return ids, vectors
 
     def __get_avg_vector(self, texts):
-        sum_vector = np.zeros(self.model.vector_size)
+        sum_vector = np.zeros(self.vector_size)
         for text in texts:
             words = [i.strip(punctuation) for i in text.split()]
             sum_vector += np.sum(self.__get_data_vectors(words), axis=0)/len(words)
@@ -43,8 +52,8 @@ class FasttextVectorizer:
         self.save_as_w2v(data, data_vectors, output_path)
 
     def __get_data_vectors(self, data):
-        vectors = np.zeros((len(data), self.model.vector_size))
-        for i, word in enumerate(data):  # TODO: how to do it more effective or one-line
+        vectors = np.zeros((len(data), self.vector_size))
+        for i, word in enumerate(data):
             vectors[i, :] = self.model[word]
         return vectors
 
@@ -69,8 +78,11 @@ def process_data(input_file, output_file):
 
 
 if __name__ == '__main__':
-    ft_vec = FasttextVectorizer("models/cc.ru.300.bin")
-    ruwordnet = RuWordnet(db_path="../data/ruwordnet.db", ruwordnet_path=None)
+    from helpers.utils import load_config
+    
+    config = load_config()
+    ft_vec = FasttextVectorizer(config["vectorizer_path"])
+    ruwordnet = RuWordnet(db_path=config["db_path"], ruwordnet_path=config["ruwordnet_path"], with_lemmas=False)
     noun_synsets = defaultdict(list)
     verb_synsets = defaultdict(list)
     for sense_id, synset_id, text in ruwordnet.get_all_senses():
@@ -78,11 +90,31 @@ if __name__ == '__main__':
             noun_synsets[synset_id].append(text.lower())
         elif synset_id.endswith("V"):
             verb_synsets[synset_id].append(text.lower())
-
-    ft_vec.vectorize_ruwordnet(noun_synsets, "models/vectors/ruwordnet_nouns.txt")
-    ft_vec.vectorize_ruwordnet(verb_synsets, "models/vectors/ruwordnet_verbs.txt")
-
-    process_data("../data/public_test/verbs_public.tsv", "models/vectors/verbs_public.txt")
-    process_data("../data/public_test/nouns_public.tsv", "models/vectors/nouns_public.txt")
-    process_data("../data/private_test/verbs_private.tsv", "models/vectors/verbs_private.txt")
-    process_data("../data/private_test/nouns_private.tsv", "models/vectors/nouns_private.txt")
+    exp_suffix = config["experiment_suffix"]
+    os.makedirs(f"predictions/{exp_suffix}", exist_ok=True)
+    os.makedirs(f"models/vectors/{exp_suffix}", exist_ok=True)
+    synsets = {
+        'nouns_synsets':noun_synsets,
+        'verbs_synsets':verb_synsets,
+              }
+    for part in ["nouns", "verbs"]:
+        vectors_dict = {
+            f"ruwordnet_vectors_{part}_path" : f"../baselines/models/vectors/{exp_suffix}/ruwordnet_{part}_{exp_suffix}.txt",
+            
+            f"public_data_vectors_{part}_path" : f"../baselines/models/vectors/{exp_suffix}/{part}_public_{exp_suffix}.txt",
+            f"private_data_vectors_{part}_path" : f"../baselines/models/vectors/{exp_suffix}/{part}_private_{exp_suffix}.txt",
+            
+            f"public_test_{part}_path": f"../data/public_test/{part}_public.tsv",
+            f"private_test_{part}_path": f"../data/private_test/{part}_private.tsv",
+            
+            f"public_output_{part}_path": f"predictions/{exp_suffix}/predicted_public_{part}_{exp_suffix}.tsv",
+            f"private_output_{part}_path": f"predictions/{exp_suffix}/predicted_private_{part}_{exp_suffix}.tsv",
+        }
+        
+        ft_vec.vectorize_ruwordnet(synsets[f"{part}_synsets"], vectors_dict[f"ruwordnet_vectors_{part}_path"])
+        process_data(vectors_dict[f"public_test_{part}_path"], vectors_dict[f"public_data_vectors_{part}_path"])
+        process_data(vectors_dict[f"private_test_{part}_path"], vectors_dict[f"private_data_vectors_{part}_path"])
+        
+        config.update(vectors_dict) # Update: config with paths
+        with open(sys.argv[1], "w", encoding="utf-8") as j:
+            json.dump(obj=config, fp=j)

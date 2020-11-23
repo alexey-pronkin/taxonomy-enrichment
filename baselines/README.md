@@ -11,6 +11,12 @@
 #### Pre-trained models
 
 fastText: [link](https://dl.fbaipublicfiles.com/fasttext/vectors-crawl/cc.ru.300.bin.gz)
+TODO
+
+#### Reproducing
+0. create env nlp: conda env create -f taxonomy_env.yml
+1. conda activate nlp 
+2. sh run_all.sh
 
 #### RUN
 

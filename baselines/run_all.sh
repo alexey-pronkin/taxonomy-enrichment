@@ -1,0 +1,16 @@
+python fasttext_vectorizer.py configs/firstlvl_fasttext_baseline.json
+python main.py configs/firstlvl_fasttext_baseline.json
+python fasttext_vectorizer.py configs/firstlvl_fasttext_cbow512_full.json
+python main.py configs/firstlvl_fasttext_cbow512_full.json
+python fasttext_vectorizer.py configs/firstlvl_fasttext_skipgram1024_news.json
+python main.py configs/firstlvl_fasttext_skipgram1024_news.json
+python fasttext_vectorizer.py configs/firstlvl_fasttext_skipgram512_full.json
+python main.py configs/firstlvl_fasttext_skipgram512_full.json
+python fasttext_vectorizer.py configs/secondlvl_fasttext_baseline.json
+python main.py configs/secondlvl_fasttext_baseline.json
+python fasttext_vectorizer.py configs/secondlvl_fasttext_cbow512_full.json
+python main.py configs/secondlvl_fasttext_cbow512_full.json
+python fasttext_vectorizer.py configs/secondlvl_fasttext_skipgram1024_news.json
+python main.py configs/secondlvl_fasttext_skipgram1024_news.json
+python fasttext_vectorizer.py configs/secondlvl_fasttext_skipgram512_full.json
+python main.py configs/secondlvl_fasttext_skipgram512_full.json

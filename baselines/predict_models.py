@@ -3,12 +3,13 @@ from abc import abstractmethod
 from ruwordnet.ruwordnet_reader import RuWordnet
 from gensim.models import KeyedVectors
 
-
 class Model:
-    def __init__(self, params):
+    def __init__(self, params, part, phase):
+        self.part = part # the part of speech
+        self.phase = phase
         self.ruwordnet = RuWordnet(db_path=params["db_path"], ruwordnet_path=params["ruwordnet_path"])
-        self.w2v_ruwordnet = KeyedVectors.load_word2vec_format(params['ruwordnet_vectors_path'], binary=False)
-        self.w2v_data = KeyedVectors.load_word2vec_format(params['data_vectors_path'], binary=False)
+        self.w2v_ruwordnet = KeyedVectors.load_word2vec_format(params[f"ruwordnet_vectors_{part}_path"], binary=False)
+        self.w2v_data = KeyedVectors.load_word2vec_format(params[f"{phase}_data_vectors_{part}_path"], binary=False)
 
     @abstractmethod
     def predict_hypernyms(self, neologisms, topn=10):
@@ -20,8 +21,8 @@ class Model:
 
 
 class BaselineModel(Model):
-    def __init__(self, params):
-        super().__init__(params)
+    def __init__(self, params, part, phase):
+        super().__init__(params, part, phase)
 
     def predict_hypernyms(self, neologisms, topn=10) -> dict:
         return {neologism: self.__compute_hypernyms(neologism, topn) for neologism in neologisms}
@@ -31,8 +32,8 @@ class BaselineModel(Model):
 
 
 class SecondOrderModel(Model):  # baseline for taxonomy-enrichment task
-    def __init__(self, params):
-        super().__init__(params)
+    def __init__(self, params, part, phase):
+        super().__init__(params, part, phase)
 
     def predict_hypernyms(self, neologisms, topn=10) -> dict:
         return {neologism: self.__compute_hypernyms(neologism, topn) for neologism in neologisms}

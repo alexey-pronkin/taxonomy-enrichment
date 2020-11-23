@@ -1,0 +1,10 @@
+{
+    "vectorizer_path":"../baselines/models/ruwiki/ruwiki_20180420_100d.pkl",
+    "ruwordnet_vectors_path": "../baselines/models/vectors/ruwordnet_nouns_fasttext.txt",
+    "data_vectors_path": "../baselines/models/vectors/nouns_public_fasttext.txt",
+    "test_path": "../dataset/public/nouns_public_no_labels.tsv",
+    "output_path": "predictions/predicted_public_nouns_fasttext.tsv",
+    "db_path": "../data/ruwordnet.db",
+    "ruwordnet_path": "../data/ruwordnet/",
+    "model": "second_order"
+  }

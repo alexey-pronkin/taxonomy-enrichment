@@ -1,0 +1,6 @@
+{
+    "vectorizer_path":"../baselines/models/baseline/cc.ru.300.bin",
+    "db_path": "../data/ruwordnet.db",
+    "ruwordnet_path": "../data/ruwordnet/",
+    "model": "baseline"
+  }
