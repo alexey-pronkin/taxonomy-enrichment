@@ -1,8 +1,8 @@
+Read the preprint: https://www.overleaf.com/read/xcxxpfpyfywy
+
 Link for fasttext vectors: https://drive.google.com/drive/folders/1W_T7czww3rslBPKjagVdk03lJWhE4OQp?usp=sharing
 
 Link for Node2Vec models: (Not saved trained but it don't take a huge time)
-
-Link for other models: 
 
 Link to colab: https://drive.google.com/file/d/11L-NYIqtyF2kSSVs0ycJ17-2rvKKOf9V/view?usp=sharing
 
