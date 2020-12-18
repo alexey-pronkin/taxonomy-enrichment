@@ -1,5 +1,7 @@
 Read the preprint: https://www.overleaf.com/read/xcxxpfpyfywy
 
+See the presentation slides: [presentation](presentation.pdf)
+
 Link for fasttext vectors: https://drive.google.com/drive/folders/1W_T7czww3rslBPKjagVdk03lJWhE4OQp?usp=sharing
 
 Link for Node2Vec models: (Not saved trained but it don't take a huge time)
