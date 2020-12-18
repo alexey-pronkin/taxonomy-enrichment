@@ -1,8 +1,8 @@
-Link for fasttext vectors:
+Read the preprint: https://www.overleaf.com/read/xcxxpfpyfywy
 
-Link for Node2Vec models:
+Link for fasttext vectors: TODO
 
-Link for other models:
+Link for Node2Vec models: TODO
 
 Link to colab:
 
